@@ -111,6 +111,9 @@ int main(int argc, char **argv)
 				oriention.data[i]=receive_data[i+8];
 			}
 			current_time = ros::Time::now();
+			position_x.d/=1000;
+			position_y.d/=1000;
+			oriention.d/=1000;
 			float dt = (current_time - last_time).toSec();
 			float delta_x=position_x.d-lastPosition_x;
 			float delta_y=position_y.d-lastPosition_y;
