@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+	<node name="keyboard_control" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>
+	<node name="vel_transform" pkg="test_p" type="vel_transform"/>
+	<node name="serial" pkg="test_p" type="serial_publish"/>
+
+</launch>

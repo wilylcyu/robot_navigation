@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+	<include file="$(find rplidar_ros)/launch/rplidar.launch" />
+	<include file="$(find rplidar_ros)/launch/gmapping.launch" />
+	<node name="serial" pkg="test_p" type="serial_recieve"/>	-->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/slam.rviz" />
+	<node name="camera" pkg="uvc_camera" type="uvc_camera_node"/>
+</launch>
