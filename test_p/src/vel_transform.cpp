@@ -3,9 +3,12 @@
 #include <geometry_msgs/Twist.h>
 #include <math.h>
 
-char ratio = 10 ;   //转速转换比例，执行速度调整比例
+float ratio = 1000 ;   //转速转换比例，执行速度调整比例
 float D = 272.5 ;    //两轮间距，单位是mm
 char const_num=2;
+float pi=3.14159;
+float const_=180;
+float linear_temp=0,angular_temp=0;
 
 class vel_transform
 {  
@@ -22,15 +25,17 @@ public:
   void callback(const geometry_msgs::Twist & cmd_input)
   {
     test_p::car_msg output;
-    if ( ( (int)cmd_input.linear.x) != 0 )     //转换前进速度到两轮速度,单位是mm/s
+    linear_temp=ratio*cmd_input.linear.x;
+    angular_temp=(cmd_input.angular.z*const_)/pi;
+    if ( ( (int)linear_temp) != 0 )     //转换前进速度到两轮速度,单位是mm/s
     {
-    	output.leftspeed = cmd_input.linear.x *ratio ;
-    	output.rightspeed = cmd_input.linear.x * ratio ;
+    	output.leftspeed = linear_temp ;
+    	output.rightspeed = linear_temp ;
     }
-    else if(((int)cmd_input.angular.z)!=0)      //转换转动速度到两轮速度，单位是mm/s
+    else if(((int)angular_temp)!=0)      //转换转动速度到两轮速度，单位是mm/s
     {
-    	output.leftspeed= - cmd_input.angular.z * D / (ratio*const_num) ;
-    	output.rightspeed= cmd_input.angular.z * D / (ratio*const_num)  ;
+    	output.leftspeed= - angular_temp* D/ (10*const_num) ;
+    	output.rightspeed= angular_temp* D / (10*const_num)  ;
     }
     else                                                             //停止时两轮速度均为0
     {
