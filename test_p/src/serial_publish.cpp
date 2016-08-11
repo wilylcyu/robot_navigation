@@ -3,6 +3,7 @@
 #include "test_p/car_msg.h"   //调用消息所用到的头文件
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
+#include <test_p/odometry_data.h>
 
 #include <string>        //以下为串口通讯需要的头文件
 #include <iostream>
@@ -109,26 +110,13 @@ int main(int argc, char **argv)
 
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscribe("car_vel", 20, carCallback);
-	ros::Publisher  odom_pub = n.advertise<nav_msgs::Odometry>("odom", 20);
+	ros::Publisher  odom_pub = n.advertise<test_p::odometry_data>("odom_data", 20);
 
-	static tf::TransformBroadcaster odom_broadcaster;
-	geometry_msgs::TransformStamped odom_trans;
   	ros::Time current_time, last_time;
-  	nav_msgs::Odometry odom;
+  	test_p::odometry_data odom_data;
 
   	current_time = ros::Time::now();
   	last_time = ros::Time::now();
-  	float covariance[36] =	{0.01, 0, 0, 0, 0, 0,  // covariance on gps_x
-				0, 0.01, 0, 0, 0, 0,  // covariance on gps_y
-				0, 0, 99999, 0, 0, 0,  // covariance on gps_z
-				0, 0, 0, 99999, 0, 0,  // large covariance on rot x
-				0, 0, 0, 0, 99999, 0,  // large covariance on rot y
-				0, 0, 0, 0, 0, 0.01};  // large covariance on rot z	
-	for(int i = 0; i < 36; i++)
-	{
-		odom.pose.covariance[i] = covariance[i];
-		odom.twist.covariance[i] = covariance[i];
-	}	
 
 	while(ros::ok())
 	{
@@ -147,7 +135,7 @@ int main(int argc, char **argv)
 			position_y.d/=1000;
 			dt = (current_time - last_time).toSec();
 			delta_x=position_x.d-lastPosition_x;
-			//delta_y=position_y.d-lastPosition_y;
+			delta_y=position_y.d-lastPosition_y;
 			delta_th=oriention.d-lastOriention;
 
 			odom_vx=(delta_x+delta_y)/(2*dt);
@@ -155,36 +143,13 @@ int main(int argc, char **argv)
 			odom_vth=delta_th/dt;				
 
 			//cout<<odom_vx<<"	"<<odom_vy<<"	"<<odom_vth<<endl;
+			odom_data.x=position_x.d;
+			odom_data.y=position_y.d;
+			odom_data.th=oriention.d;
+			odom_data.vel_x=odom_vx;
+			odom_data.vel_th=odom_vth;
 
-			geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(oriention.d);
-
-
-			odom_trans.header.stamp = current_time;
-			odom_trans.header.frame_id = "odom";			//发布坐标变换的父子坐标系
-			odom_trans.child_frame_id = "base_link";
-
-			odom_trans.transform.translation.x =position_x.d;;// position_x.d;
-			odom_trans.transform.translation.y = position_y.d;//;
-			odom_trans.transform.translation.z = 0.0;
-			odom_trans.transform.rotation = odom_quat;
-
-			odom_broadcaster.sendTransform(odom_trans);
-			
-
-			odom.header.stamp = current_time;			
-			odom.header.frame_id = "odom";
-			odom.child_frame_id = "base_link";
-
-			odom.pose.pose.position.x = position_x.d;//;        //里程计位置数据
-			odom.pose.pose.position.y = position_y.d;//;
-			odom.pose.pose.position.z = 0.0;
-			odom.pose.pose.orientation = odom_quat;
-
-   			odom.twist.twist.linear.x = odom_vx;
-    			odom.twist.twist.linear.y = odom_vy;
-    			odom.twist.twist.angular.z = odom_vth;
-
-			odom_pub.publish(odom);
+			odom_pub.publish(odom_data);
 
 			last_time = current_time;
 			lastPosition_x=position_x.d;
