@@ -6,35 +6,37 @@ from geometry_msgs.msg import Twist
 
 import sys, select, termios, tty
 
+#Reading from the keyboard  and Publishing to Twist!
+#---------------------------
+#Moving around:
+#   u    i    o
+#   j    k    l
+#   m    ,    .
+#For Holonomic mode (strafing), hold down the shift key:
+#---------------------------
+#   U    I    O
+#   J    K    L
+#   M    <    >
+#t : up (+z)
+#b : down (-z)
+
 msg = """
-Reading from the keyboard  and Publishing to Twist!
----------------------------
-Moving around:
-   u    i    o
-   j    k    l
-   m    ,    .
+                 Forward  w
 
-For Holonomic mode (strafing), hold down the shift key:
----------------------------
-   U    I    O
-   J    K    L
-   M    <    >
+ Left       a                    Right    d
 
-t : up (+z)
-b : down (-z)
+                  Back      s
 
+                  Reset    r
+                  
 anything else : stop
-
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
 
 CTRL-C to quit
 """
 
 moveBindings = {
 		'w':(1,0,0,0),
-#		'o':(1,0,0,-1),
+		'r':(1,1,1,1),
 		'd':(0,0,0,1),
 		'a':(0,0,0,-1),
 #		'u':(1,0,0,1),
@@ -112,10 +114,15 @@ if __name__=="__main__":
 				th = 0
 				if (key == '\x03'):
 					break
-
-			twist = Twist()
-			twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
-			twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
+			twist = Twist()					
+			if(y==1):
+				twist.linear.x=x;
+				twist.linear.y=y;
+				twist.linear.z=z;
+				twist.angular.z=th;
+			else:				
+				twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
+				twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
 			pub.publish(twist)
 
 	except:

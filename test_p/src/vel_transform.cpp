@@ -24,24 +24,32 @@ public:
   
   void callback(const geometry_msgs::Twist & cmd_input)
   {
-    test_p::car_msg output;
-    linear_temp=ratio*cmd_input.linear.x;
-    angular_temp=(cmd_input.angular.z*const_)/pi;
-    if ( ( (int)linear_temp) != 0 )     //转换前进速度到两轮速度,单位是mm/s
-    {
-    	output.leftspeed = linear_temp ;
-    	output.rightspeed = linear_temp ;
-    }
-    else if(((int)angular_temp)!=0)      //转换转动速度到两轮速度，单位是mm/s
-    {
-    	output.leftspeed= - angular_temp* D/ (10*const_num) ;
-    	output.rightspeed= angular_temp* D / (10*const_num)  ;
-    }
-    else                                                             //停止时两轮速度均为0
-    {
-    	output.leftspeed = 0 ;
-    	output.rightspeed = 0;
-    }
+      test_p::car_msg output;
+	if((cmd_input.linear.x==1)&&(cmd_input.linear.x==1)&&(cmd_input.linear.x==1)&&(cmd_input.angular.z==1))
+	{
+    		output.leftspeed = 1 ;
+    		output.rightspeed = 1;		
+	}
+	else
+	{
+    		linear_temp=ratio*cmd_input.linear.x;
+    		angular_temp=(cmd_input.angular.z*const_)/pi;
+    		if ( ( (int)linear_temp) != 0 )     //转换前进速度到两轮速度,单位是mm/s
+   		{
+    			output.leftspeed = linear_temp ;
+    			output.rightspeed = linear_temp ;
+    		}
+    		else if(((int)angular_temp)!=0)      //转换转动速度到两轮速度，单位是mm/s
+   		{
+    			output.leftspeed= - angular_temp* D/ (10*const_num) ;
+    			output.rightspeed= angular_temp* D / (10*const_num)  ;
+    		}
+    		else                                                             //停止时两轮速度均为0
+    		{
+    			output.leftspeed = 0 ;
+    			output.rightspeed = 0;
+    		}
+	}
 
     //写入/cmd_vel发出的消息转换成左右轮速度的过程
     pub_.publish(output);

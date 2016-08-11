@@ -66,13 +66,23 @@ void carCallback(const test_p::car_msg& msg)
 	unsigned long baud = 115200;
 	serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
 
-	rightdata.d=msg.rightspeed;
-	leftdata.d=msg.leftspeed;
-
-	for(int i=0;i<4;i++)
+	if((msg.rightspeed==1)&&(msg.leftspeed==1))
 	{
-		publish_data[i]=rightdata.data[i];
-		publish_data[i+4]=leftdata.data[i];
+		for(int i=0;i++;i<8)
+		{
+			publish_data[i]==0x32;
+		}
+	}
+	else
+	{
+		rightdata.d=msg.rightspeed;
+		leftdata.d=msg.leftspeed;
+
+		for(int i=0;i<4;i++)
+		{
+			publish_data[i]=rightdata.data[i];
+			publish_data[i+4]=leftdata.data[i];
+		}
 	}
 	publish_data[8]=data_terminal0;
 	publish_data[9]=data_terminal1;
@@ -111,6 +121,9 @@ int main(int argc, char **argv)
 				oriention.data[i]=receive_data[i+8];
 			}
 			current_time = ros::Time::now();
+			position_x.d/=1000;
+			position_y.d/=1000;
+			oriention.d/=1000;
 			float dt = (current_time - last_time).toSec();
 			float delta_x=position_x.d-lastPosition_x;
 			float delta_y=position_y.d-lastPosition_y;
@@ -149,7 +162,7 @@ int main(int argc, char **argv)
     			odom.twist.twist.linear.y = odom_vy;
     			odom.twist.twist.angular.z = odom_vth;
 
-			//odom_pub.publish(odom);
+			odom_pub.publish(odom);
 
 			last_time = current_time;
 			lastPosition_x=position_x.d;
