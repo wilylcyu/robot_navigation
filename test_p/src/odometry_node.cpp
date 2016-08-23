@@ -5,6 +5,9 @@
 #include <math.h>
 #include <test_p/odometry_data.h>
 #include <nav_msgs/Odometry.h>
+#include <iostream>
+
+using namespace std;
 
 class odometry_pub
 {  
@@ -17,27 +20,27 @@ public:
   
   void callback(const test_p::odometry_data& odometry_input)
   {
-     static tf::TransformBroadcaster odom_broadcaster;
+      static tf::TransformBroadcaster odom_broadcaster;
       geometry_msgs::TransformStamped odom_trans;
       nav_msgs::Odometry odom; 
 
       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(odometry_input.th);
-
-      float covariance[36] =  {0.01, 0, 0, 0, 0, 0,  // covariance on gps_x
-            0, 0.01, 0, 0, 0, 0,  // covariance on gps_y
-            0, 0, 99999, 0, 0, 0,  // covariance on gps_z
-            0, 0, 0, 99999, 0, 0,  // large covariance on rot x
-            0, 0, 0, 0, 99999, 0,  // large covariance on rot y
-            0, 0, 0, 0, 0, 0.01};  // large covariance on rot z 
-      for(int i = 0; i < 36; i++)
-      {
-        odom.pose.covariance[i] = covariance[i];
-        odom.twist.covariance[i] = covariance[i];
-      } 
+      cout<<odometry_input.th<<endl;
+      // float covariance[36] =  {0.01, 0, 0, 0, 0, 0,  // covariance on gps_x
+      //       0, 0.01, 0, 0, 0, 0,  // covariance on gps_y
+      //       0, 0, 0.01, 0, 0, 0,  // covariance on gps_z
+      //       0, 0, 0, 0.01, 0, 0,  // large covariance on rot x
+      //       0, 0, 0, 0, 0.01, 0,  // large covariance on rot y
+      //       0, 0, 0, 0, 0, 0.01};  // large covariance on rot z 
+      // for(int i = 0; i < 36; i++)
+      // {
+      //   odom.pose.covariance[i] = covariance[i];
+      //   odom.twist.covariance[i] = covariance[i];
+      // } 
 
       odom_trans.header.stamp = ros::Time::now();
       odom_trans.header.frame_id = "odom";      //发布坐标变换的父子坐标系
-      odom_trans.child_frame_id = "base_link";
+      odom_trans.child_frame_id = "base_footprint";
 
       odom_trans.transform.translation.x =odometry_input.x;// position_x.d;
       odom_trans.transform.translation.y = odometry_input.y;//;
@@ -48,7 +51,7 @@ public:
       
       odom.header.stamp = ros::Time::now();     
       odom.header.frame_id = "odom";
-      odom.child_frame_id = "base_link";
+      odom.child_frame_id = "base_footprint";
 
       odom.pose.pose.position.x = odometry_input.x;//;        //里程计位置数据
       odom.pose.pose.position.y = odometry_input.y;//;
