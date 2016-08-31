@@ -1,0 +1,25 @@
+<!--
+  Tests the velocity smoother with varied translational inputs.
+  move_base 的输出速度平滑处理，代替move_base.launch
+ -->
+<launch>
+
+  <include file="$(find yocs_velocity_smoother)/launch/bringup_smoother.launch" />
+  
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="keyboard_teleop" output="screen">
+    <!--<remap from="keyboard_teleop/cmd_vel" to="cmd_vel/input"/>-->	 
+  </node>
+  
+
+  <!--<node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
+    <rosparam file="$(find rbx1_nav)/config/fake/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find rbx1_nav)/config/fake/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find rbx1_nav)/config/fake/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rbx1_nav)/config/fake/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rbx1_nav)/config/fake/base_local_planner_params.yaml" command="load" />
+
+    <remap from="cmd_vel"   to="navigation_velocity_smoother/raw_cmd_vel"/>
+    
+  </node>-->
+  
+</launch>
