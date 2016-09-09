@@ -1,12 +1,31 @@
 <?xml version="1.0"?>
 
 <launch>
+	<!--start rplidar driver node -->
 	<include file="$(find rplidar_ros)/launch/rplidar.launch" />
+
+	<!--start gmapping node -->
 	<include file="$(find rplidar_ros)/launch/gmapping.launch" />
+
+	<!--start move_base-->
+	<!--<include file="$(find rbx1_nav)/launch/tb_move_base.launch" />-->
+	
+	<!--bring up velocity smoother nodelet-->
+	<include file="$(find yocs_velocity_smoother)/launch/bringup_smoother.launch" />
+
+	<!--start serial-port publish and recieve node-->
 	<node name="serial" pkg="test_p" type="serial_publish"/>
-<!--	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/slam.rviz" />-->
+
+	<!--	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar
+_ros)/rviz/slam.rviz" />-->
 	<!--<node name="camera" pkg="uvc_camera" type="uvc_camera_node"/>-->
+
+	<!--start odometry-->
 	<node name="odometry_node" pkg="test_p" type="odometry_node"/>
+
 	<!--<node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>-->
 	<!--<node name="vel_transform" pkg="test_p" type="vel_transform"/>-->
+
+
+
 </launch>

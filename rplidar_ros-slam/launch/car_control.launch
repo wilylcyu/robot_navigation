@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-	<node name="keyboard_control" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"/>
+	<node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 base_footprint base_link 50" />
+	<node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="keyboard_control"/>
 	<node name="vel_transform" pkg="test_p" type="vel_transform"/>
+	<node name="odometry_node" pkg="test_p" type="odometry_node"/>
 	<node name="serial" pkg="test_p" type="serial_publish"/>
 
 </launch>
