@@ -3,14 +3,12 @@
 #include <geometry_msgs/Twist.h>
 #include <math.h>
 
-float ratio = 1000 ;   //转速转换比例，执行速度调整比例
-float D = 272.5 ;    //两轮间距，单位是mm
+float ratio = 1000.0f ;   //转速转换比例，执行速度调整比例
+float D = 0.2725f ;    //两轮间距，单位是mm
 char const_num=2;
-float pi=3.14159;
-float const_=180;
+float pi=3.14159f;
+float const_=180.0f;
 float linear_temp=0,angular_temp=0;
-float limit_rot_speed=0;
-float limit_vel_speed=0;
 
 class vel_transform
 {  
@@ -27,43 +25,17 @@ public:
   void callback(const geometry_msgs::Twist & cmd_input)
   {
       test_p::car_msg output;
-            if(cmd_input.angular.z>0.15)            //limit  rotation speed 
-              {
-                      limit_rot_speed=0.15;
-              }
-              else if(cmd_input.angular.z<-0.15)
-              {
-                      limit_rot_speed=-0.15;
-              }
-              else
-              {
-                      limit_rot_speed=cmd_input.angular.z;
-              }
-              if(cmd_input.linear.x>0.07)
-              {
-                      limit_vel_speed=0.07;
-              }
-              else
-              {
-                      limit_vel_speed=cmd_input.linear.x;
-              }
-    		linear_temp=ratio*limit_vel_speed;
-    		angular_temp=(limit_rot_speed*const_)/pi;
-    		if ( ( (int)linear_temp) != 0 )     //转换前进速度到两轮速度,单位是mm/s
-   		{
-    			output.leftspeed = linear_temp ;
-    			output.rightspeed = linear_temp ;
-    		}
-    		else if(((int)angular_temp)!=0)      //转换转动速度到两轮速度，单位是mm/s
-   		{
-    			output.leftspeed= - angular_temp* D/ (10*const_num) ;
-    			output.rightspeed= angular_temp* D / (10*const_num)  ;
-    		}
-    		else                                                             //停止时两轮速度均为0
-    		{
-    			output.leftspeed = 0 ;
-    			output.rightspeed = 0;
-    		}
+
+             angular_temp = 0.5f*cmd_input.angular.z*D ;
+
+             linear_temp =cmd_input.linear.x ;
+    		// linear_temp = ratio*limit_vel_speed ;
+
+    		output.leftspeed = linear_temp-angular_temp ;
+    		output.rightspeed = linear_temp+angular_temp ;
+
+              output.leftspeed*=ratio;
+              output.rightspeed*=ratio;
 
     //写入/cmd_vel发出的消息转换成左右轮速度的过程
     pub_.publish(output);

@@ -39,7 +39,7 @@ union floatData
 {
      float d;
      unsigned char data[4];
- }rightdata,leftdata,position_x,position_y,oriention;
+ }rightdata,leftdata,position_x,position_y,oriention,vel_linear,vel_angular;
 
 int count = 0;
 
@@ -120,52 +120,55 @@ int main(int argc, char **argv)
 
 	while(ros::ok())
 	{
-		rec_buffer =my_serial.readline(15,"\n");
+		rec_buffer =my_serial.readline(25,"\n");
 		const char *receive_data=rec_buffer.data();
-		if(rec_buffer.length()==13)
+		if(rec_buffer.length()==21)
 		{
 			for(int i=0;i<4;i++)
 			{
 				position_x.data[i]=receive_data[i];
 				position_y.data[i]=receive_data[i+4];
 				oriention.data[i]=receive_data[i+8];
+				vel_linear.data[i]=receive_data[i+12];
+				vel_angular.data[i]=receive_data[i+16];
 			}
 			current_time = ros::Time::now();
 			position_x.d/=1000;
 			position_y.d/=1000;
-			dt = (current_time - last_time).toSec();
-			delta_x=position_x.d-lastPosition_x;
-			delta_y=position_y.d-lastPosition_y;
-			delta_th=oriention.d-lastOriention;
+			vel_linear.d/=1000;
+			//dt = (current_time - last_time).toSec();
+			//delta_x=position_x.d-lastPosition_x;
+			//delta_y=position_y.d-lastPosition_y;
+			//delta_th=oriention.d-lastOriention;
 
-			odom_vx=(delta_x+delta_y)/(2*dt);
+			//odom_vx=delta_x/(cos(oriention.d)*dt);
 			//odom_vy=(delta_y*cos(oriention.d)-delta_x*sin(oriention.d))/dt;
-			odom_vth=delta_th/dt;				
+			//odom_vth=delta_th/dt;				
 
-			//cout<<odom_vx<<"	"<<odom_vy<<"	"<<odom_vth<<endl;
+			cout<<vel_angular.d<<endl;
 			odom_data.x=position_x.d;
 			odom_data.y=position_y.d;
 			odom_data.th=oriention.d;
-			odom_data.vel_x=odom_vx;
-			odom_data.vel_th=odom_vth;
+			odom_data.vel_x=vel_linear.d;
+			odom_data.vel_th=vel_angular.d;
 
 			odom_pub.publish(odom_data);
 
-			last_time = current_time;
-			lastPosition_x=position_x.d;
-			lastPosition_y=position_y.d;
-			lastOriention=oriention.d;
+			//last_time = current_time;
+			//lastPosition_x=position_x.d;
+			//lastPosition_y=position_y.d;
+			//lastOriention=oriention.d;
 		}
 		else
 		{
 			if((receive_data[0]==0x01)&&(receive_data[1]==0x01)&&(receive_data[1]==0x01))
 			{
-				cout<<"command right ！"<<endl;
+				//cout<<"command right ！"<<endl;
 			}
 			if((receive_data[0]==0x00)&&(receive_data[1]==0x00)&&(receive_data[1]==0x00))
 			{
 				my_serial.write(publish_data,10);
-				cout<<"command send again !"<<endl;
+				//cout<<"command send again !"<<endl;
 			}
 		}
 		ros::spinOnce();  //callback函数必须处理所有问题时，才可以用到
