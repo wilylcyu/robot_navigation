@@ -36,9 +36,9 @@ CTRL-C to quit
 
 moveBindings = {
 		'w':(1,0,0,0),
-		'r':(1,1,1,1),
-		'd':(0,0,0,1),
-		'a':(0,0,0,-1),
+#		'r':(1,1,1,1),
+		'd':(0,0,0,-1),
+		'a':(0,0,0,1),
 #		'u':(1,0,0,1),
 #		',':(-1,0,0,0),
 #		'.':(-1,0,0,1),
@@ -72,7 +72,7 @@ def getKey():
 	return key
 
 speed = 0.07      
-turn = 0.08727  
+turn = 0.5  
 
 def vels(speed,turn):
 	return "currently:\tspeed %s\tturn %s " % (speed,turn)
